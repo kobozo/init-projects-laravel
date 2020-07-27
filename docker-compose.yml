@@ -25,7 +25,7 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_DATABASE: alkuhl
+      MYSQL_DATABASE: dev
       MYSQL_USER: dev
       MYSQL_PASSWORD: development
       MYSQL_ROOT_PASSWORD: development
@@ -40,13 +40,31 @@ services:
       - ./src:/var/www
     ports:
       - "9000:9000"
+    command: sh -c "/wait && php artisan migrate && php artisan passport:install && php-fpm"
+    environment:
+      - WAIT_HOSTS=mysql:3306,redis:6379,rabbitmq:5672
+      - WAIT_HOSTS_TIMEOUT=300
+      - WAIT_SLEEP_INTERVAL=30
+      - WAIT_HOST_CONNECT_TIMEOUT=30
+    depends_on: 
+      - mysql
+      - rabbitmq
+      - redis
     networks:
       - laravel
-  redis:
-    image: redis:alpine
-    container_name: redis
-    ports:
-      - "6379:6379"
-    command: redis-server --requirepass development
-    networks:
-      - laravel
+  # redis:
+  #   image: redis:alpine
+  #   container_name: redis
+  #   ports:
+  #     - "6379:6379"
+  #   command: redis-server --requirepass development
+  #   networks:
+  #     - laravel
+  # rabbitmq:
+  #   image: rabbitmq:3-management
+  #   container_name: rabbitmq
+  #   ports:
+  #     - "5672:5672"
+  #     - "15672:15672"
+  #   networks:
+  #     - laravel

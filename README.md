@@ -1,1 +1,3 @@
-init-projects-laravel
+laravel new src
+
+mv .env src/
